@@ -1,0 +1,13 @@
+<AddIn Type="Standard">
+  <ClassId>{E1A472E8-8956-4BC9-9A74-D72D1E4E81C5}</ClassId>
+  <ClientId>{E1A472E8-8956-4BC9-9A74-D72D1E4E81C5}</ClientId>
+  <DisplayName>InventorAI Chat</DisplayName>
+  <Description>Create CAD models in Autodesk Inventor using natural language and MCP Gateway.</Description>
+  <Assembly>InventorAIChatAddIn.dll</Assembly>
+  <LoadOnStartup>1</LoadOnStartup>
+  <UserUnloadable>1</UserUnloadable>
+  <Hidden>0</Hidden>
+  <SupportedSoftwareVersionGreaterThan>27..</SupportedSoftwareVersionGreaterThan>
+  <DataVersion>1</DataVersion>
+  <UserInterfaceVersion>1</UserInterfaceVersion>
+</AddIn>
