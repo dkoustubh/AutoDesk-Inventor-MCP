@@ -1,0 +1,26 @@
+{
+  "test_id": "GOLDEN_SPROCKET_005",
+  "name": "ISO 606 Roller Chain Drive Sprocket",
+  "prompt": "Create an ISO 606 14-tooth drive sprocket with 60 mm outer diameter, 8 mm thickness, and 12 mm bore",
+  "expected_specification": {
+    "part_type": "sprocket",
+    "units": "mm",
+    "dimensions": {
+      "outer_diameter_mm": 60.0,
+      "teeth_count": 14,
+      "thickness_mm": 8.0,
+      "bore_diameter_mm": 12.0
+    }
+  },
+  "expected_features": [
+    "sprocket_body"
+  ],
+  "validation_criteria": {
+    "must_be_watertight": true,
+    "must_be_single_solid": true,
+    "checklist": {
+      "manifold_and_watertight": true,
+      "valid_solid_brep": true
+    }
+  }
+}
