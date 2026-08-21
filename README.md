@@ -1,69 +1,127 @@
-# Autodesk Inventor MCP & Industrial CAD Automation Platform
+# OmniCAD — Professional AI-Native Parametric Mechanical CAD Platform
 
 [![Contributor](https://img.shields.io/badge/Contributor-dkoustubh-blue.svg)](https://github.com/dkoustubh)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![Autodesk](https://img.shields.io/badge/CAD-Autodesk%20Inventor-E51A24.svg)](https://www.autodesk.com/products/inventor/overview)
+[![Kernel](https://img.shields.io/badge/CAD%20Kernel-OpenCASCADE%20%2F%20build123d-FF6F00.svg)](https://build123d.readthedocs.io/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-8A2BE2.svg)](https://modelcontextprotocol.io/)
 [![Three.js](https://img.shields.io/badge/Viewport-Three.js%20%2F%20WebGL-000000.svg)](https://threejs.org/)
+[![Pytest](https://img.shields.io/badge/Tests-19%20Passed%20(100%25)-brightgreen.svg)](tests/)
 
-An enterprise-grade **Industrial CAD Automation Platform** and **Model Context Protocol (MCP) Server** that bridges Large Language Models (LLMs) with native desktop **Autodesk Inventor** CAD sessions across local networks.
-
-Translate natural language engineering specifications into structured, B-Rep validated solid geometry executed live inside Autodesk Inventor on engineer workstations.
-
----
-
-## 🌟 Key Highlights
-
-- 🧠 **Natural Language to Parametric CAD**: Direct translation of engineering intents into precise 3D solid operations (cubes, cylinders, cones, sprockets, complex extrusions, boolean cuts, fillets, chamfers, and compound assemblies).
-- 🔌 **Model Context Protocol (MCP) Server**: Official Node.js/TypeScript MCP implementation compatible with **Claude Desktop**, **Cursor IDE**, and **OpenWebUI**.
-- ⚡ **Real-Time WebSocket Agent Engine**: Lightweight C# .NET 8 and PowerShell workstation agents that attach to active Autodesk Inventor COM interfaces and execute commands with sub-second latency.
-- 📐 **B-Rep & OpenCASCADE Kernel Validation**: Dual-layer verification utilizing Build123d / OpenCASCADE to check volume, face counts, watertight solid integrity, and STEP exports before execution.
-- 🖥️ **Industrial 3-Pane Web Studio**: Interactive 3D WebGL CAD viewport (Three.js), project version management, real-time pipeline progress telemetry, and geometric inspection.
+An enterprise-grade **Industrial AI-Native Parametric Mechanical CAD Platform** and **Model Context Protocol (MCP) Server** that translates natural language engineering requests into geometrically validated, dimensionally accurate 3D CAD models and executes them live in **Autodesk Inventor**.
 
 ---
 
-## 🏗️ Architecture & Topology
+## 🧭 Core Architectural Philosophy
+
+> **"Gemma is NOT the CAD kernel. Gemma is the Interpreter and Planner. Deterministic CAD engines construct the geometry. Validators verify. Repair engines fix. Only 100% verified geometry reaches the engineer."**
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           AI & IDE Client Interfaces                            │
-│  ┌───────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐  │
-│  │   Industrial CAD      │  │    Claude Desktop    │  │     Cursor IDE /     │  │
-│  │   Web Studio (:8085)  │  │      / OpenWebUI     │  │      Any MCP Host    │  │
-│  └───────────┬───────────┘  └──────────┬───────────┘  └──────────┬───────────┘  │
-└──────────────┼─────────────────────────┼─────────────────────────┼──────────────┘
-               │ HTTP / WS               │ Stdio / MCP             │ MCP
-               ▼                         ▼                         ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                 Central CAD Gateway & AI Server (FastAPI :8005)                 │
-│  ┌─────────────────────────┐ ┌─────────────────────────┐ ┌───────────────────┐  │
-│  │  Prompt / Intent Engine │ │  OpenCASCADE Validator  │ │  APS MCP Server   │  │
-│  │  (Gemma / vLLM / Claude)│ │  (Build123d Kernel)     │ │  (Node.js / TS)   │  │
-│  └───────────┬─────────────┘ └───────────┬─────────────┘ └─────────┬─────────┘  │
-│              └─────────────────────┬─────┘                         │            │
-│                                    ▼                               │            │
-│                     ┌─────────────────────────────┐                │            │
-│                     │  Workstation Redis Queue    │◄───────────────┘            │
-│                     │  & WebSocket Dispatcher     │                             │
-│                     └──────────────┬──────────────┘                             │
-└────────────────────────────────────┼────────────────────────────────────────────┘
-                                     │ WebSocket (:8005/ws/agent/{ip})
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│             Windows CAD Workstation (e.g., 192.168.11.150)                      │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │  ATS Autodesk Agent (C# .NET 8 / PowerShell COM Bridge)                   │  │
-│  │  - Attaches to running Autodesk Inventor COM API (`Inventor.Application`) │  │
-│  │  - Executes sketches, extrusions, boolean solids, holes, patterns         │  │
-│  │  - Captures viewport telemetry and export artifacts (STEP/STL/DWG)        │  │
-│  └───────────────────────────────────┬───────────────────────────────────────┘  │
-│                                      ▼                                          │
-│  ┌───────────────────────────────────────────────────────────────────────────┐  │
-│  │                   Autodesk Inventor Desktop Application                   │  │
-│  │                   (Active Part / Assembly Document)                       │  │
-│  └───────────────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────────┘
+Natural Language Engineering Request
+                 │
+                 ▼
+1. Engineering Language Interpreter (ELI)
+   • Lossless requirement normalization
+   • Non-blocking ambiguity detection
+   • Conversational parametric editing
+                 │
+                 ▼
+2. Engineering Knowledge Base (EKB)
+   • ISO 606, DIN 8187, ASME B16.5, ISO 2768-m
+   • Conveyor, ASRS, Sprocket, Gear, Flange templates
+                 │
+                 ▼
+3. Parametric Feature Graph (DAG)
+   • Nodes: Primitives, Extrusions, Holes, Patterns
+   • Edges: Dependencies and workplane constraints
+                 │
+                 ▼
+4. Deterministic Math & Constraint Solver
+   • PCD bolt trigonometry: (R·cos θ, R·sin θ)
+   • Hierarchy check: D_bore < D_raised_face < PCD < D_outer
+   • Wall thickness & edge margin assertions (> 2.0 mm)
+                 │
+                 ▼
+5. Parametric CAD Code Generator
+   • Named engineering constants in Python build123d DSL
+                 │
+                 ▼
+6. OpenCASCADE CAD Kernel Execution
+   • B-Rep solid construction in isolated sandbox
+   • Export STEP (ISO-10303), STL, GLB, and JSON metadata
+                 │
+                 ▼
+7. Dual Geometric & Visual Validation
+   • BRepCheck_Analyzer watertightness & manifold verification
+   • Cylindrical surface radius measurement & PCD hole counting
+   • 4-View (ISO, Top, Front, Right) contact sheet projection
+                 │
+                 ▼
+8. Closed-Loop Feature Repair Engine
+   • Localized diagnostic & targeted non-destructive patch
+                 │
+                 ▼
+9. Verified Artifacts Dispatched to Autodesk Inventor
+   • Live desktop execution via C# / PowerShell COM Agent
+```
+
+---
+
+## 🌟 Key Capabilities
+
+### 1. Lossless Engineering Language Interpreter (ELI)
+- Extracts 100% of explicit and implicit dimensions without losing constraints.
+- Identifies underspecified inputs (e.g. *"Make a bracket"*) and asks targeted clarification questions rather than guessing arbitrary geometry.
+- Supports **Conversational Parametric Editing** (e.g. *"Change the PCD from 120 mm to 125 mm"*, *"Increase flange thickness to 25 mm"*) by modifying existing Feature Graph nodes without regenerating the entire part.
+
+### 2. Parametric Feature Graph (DAG)
+- Complete internal tree representation of all atomic operations (`box`, `cylinder`, `through_hole`, `circular_pattern`, `raised_face`, `fillet`, `chamfer`, `boss`, `slot`, `pocket`).
+- Generates clean, human-readable Python `build123d` source code that mechanical engineers can review and inspect.
+
+### 3. Industrial Part & Mechanical Knowledge Base
+- **Pipe Flanges**: ASME B16.5 / ISO 7005-1 (base disc, center through-bore, raised face, circular PCD bolt pattern).
+- **Conveyor & Material Handling**: Conveyor Rollers (ISO 1537 / CEMA), Mounting Plates (ISO 2768-m), Ribbed Brackets, Powered Roller Beds (PRB), Rotary Turntables.
+- **Power Transmission**: ISO 606 & ANSI B29.1 Roller Chain Sprockets (06B, 08B, 10B, 12B, ANSI 35, 40, 50, 60), Involute Planetary & Spur Gear kinematics ($Z_{\text{ring}} = Z_{\text{sun}} + 2 \cdot Z_{\text{planet}}$).
+
+### 4. Dual-Engine Validation & Closed-Loop Repair
+- **Topological B-Rep Validation**: Explores OpenCASCADE face topology, measures inner/outer cylinder radii, verifies through-hole penetration, computes exact analytical volume ($V \pm 1\%$).
+- **Multi-View Visual Inspection**: Generates 4-view orthographic contact sheets (Isometric, Top, Front, Right).
+- **Localized Repair Loop**: If any check fails, the repair engine diagnoses the failing constraint and patches only the target feature.
+
+### 5. Multi-Provider LLM Abstraction & Model Router
+- **Gemma 31B Local**: Hosted on-premise at `http://192.168.11.86:8000/v1` (96 GB VRAM server).
+- **Mistral API Reviewer**: Cloud second-opinion reviewer for safety-critical or high-risk mechanical checks.
+
+---
+
+## 🏗️ Hardware Topology & Deployment
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      Central AI Server (192.168.11.86)                      │
+│  • 96 GB VRAM GPU Cluster                                                   │
+│  • Gemma 31B (vLLM Engine :8000)                                            │
+│  • Open WebUI & Local Model Inference                                       │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ High-Speed LAN
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                 Central CAD Gateway (Mac / Linux 192.168.11.94)             │
+│  • FastAPI REST & WebSocket Backend (:8005)                                 │
+│  • ELI & 10-Stage CAD Reasoning Pipeline                                    │
+│  • OpenCASCADE 7.9 B-Rep Kernel & build123d Sandbox                         │
+│  • Redis Job Queue & Workstation Dispatcher                                 │
+│  • OmniCAD 3-Pane Web Studio (React + Three.js :8085 / :9999)               │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ WebSocket Dispatcher (:8005/ws/agent)
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                 Windows CAD Workstation (192.168.11.150)                    │
+│  • Autodesk Inventor 2026 Desktop Session                                   │
+│  • ATS Workstation Agent (.NET 8 C# / PowerShell COM Bridge)                │
+│  • Live sketch extrusion, boolean features, holes, pattern execution        │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -71,256 +129,146 @@ Translate natural language engineering specifications into structured, B-Rep val
 ## 📁 Repository Structure
 
 ```
-├── aps-mcp-server/         # Node.js / TypeScript Model Context Protocol (MCP) server
-│   ├── src/index.ts        # MCP Tools (inventor_create_box, sprockets, compound, etc.)
-│   └── package.json        # MCP Server configuration
-│
-├── autodesk-agent/         # Windows Workstation Agent (.NET 8 & PowerShell)
-│   ├── ATS.AutodeskAgent.sln
-│   ├── src/                # C# WebSocket Client & Inventor COM interop
-│   ├── agent.ps1           # Standalone PowerShell COM automation agent
-│   ├── run.bat             # Quick launch script for Windows workstation
-│   └── install.bat         # Service/Add-in installer
-│
-├── backend/                # Central AI & CAD Gateway (FastAPI)
+├── backend/                    # Central AI & CAD Gateway (FastAPI)
 │   ├── app/
-│   │   ├── main.py         # FastAPI application entrypoint
-│   │   ├── api/            # REST & WebSocket endpoints (chat, jobs, agents, render)
-│   │   ├── services/       # LLM intent parser, Build123d kernel validator, Redis queue
-│   │   └── models.py       # SQLAlchemy & Pydantic schemas
-│   ├── requirements.txt    # Python dependencies
-│   └── Dockerfile          # Container definition
+│   │   ├── main.py             # FastAPI entrypoint & router registration
+│   │   ├── config.py           # Server & workstation configuration
+│   │   ├── api/                # REST & WS endpoints (/api/chat, /ws/agent, etc.)
+│   │   ├── pipeline/           # 10-Stage Contract-Driven CAD Reasoning Engine
+│   │   │   ├── eli.py                  # Engineering Language Interpreter & Parametric Editor
+│   │   │   ├── feature_graph.py        # Parametric Feature Graph (DAG) & Code Gen
+│   │   │   ├── knowledge_base.py       # Part Templates (Conveyor, ASRS, Mechanical)
+│   │   │   ├── math_solver.py          # Analytical trigonometry & constraint validation
+│   │   │   ├── math_sprocket.py        # ISO 606 / ANSI roller chain sprocket math
+│   │   │   ├── math_gear.py            # Involute planetary & spur gear kinematics
+│   │   │   ├── feature_planner.py      # Ordered atomic CAD construction planning
+│   │   │   ├── cad_generator.py        # Parametric build123d DSL generator
+│   │   │   ├── kernel_runner.py        # OpenCASCADE execution sandbox & exporter
+│   │   │   ├── geometric_validator.py  # OpenCASCADE B-Rep surface inspection
+│   │   │   ├── visual_validator.py     # 4-view contact sheet generator
+│   │   │   ├── repair_engine.py        # Closed-loop targeted repair planner
+│   │   │   └── engine.py               # Master 10-Stage Pipeline Coordinator
+│   │   └── services/           # Redis queue, Job manager, LLM connector
+│   └── requirements.txt
 │
-├── frontend/               # Industrial 3-Pane Web Studio (React + Vite + TailwindCSS)
+├── frontend/                   # OmniCAD 3-Pane Web Studio (React + Vite + TailwindCSS)
 │   ├── src/
-│   │   ├── components/     # CadViewport3D, LeftProjectSidebar, RightInspector, etc.
-│   │   ├── types/          # CAD feature & project interfaces
-│   │   └── App.tsx         # Main application layout
-│   └── Dockerfile          # Nginx production container
+│   │   ├── components/         # CadViewport3D, LeftProjectSidebar, RightInspector, TopToolbar
+│   │   ├── types/              # TypeScript CAD interfaces & validation schemas
+│   │   └── App.tsx             # Studio layout with blank canvas initialization
+│   └── package.json
 │
-├── openwebui-tools/        # Custom OpenWebUI Tools & CAD Skills
-│   ├── autodesk_inventor_tools.py  # Python function calling tools for OpenWebUI
-│   └── autodesk_cad_skill.md       # CAD design system prompt & engineering rules
+├── autodesk-agent/             # Windows Workstation Agent (.NET 8 & PowerShell)
+│   ├── src/                    # C# WebSocket Client & Inventor COM interop
+│   ├── agent.ps1               # Standalone PowerShell COM automation agent
+│   ├── run.bat                 # One-click launch script
+│   └── install.bat             # Service / Add-in installer
 │
-├── exports/                # Export artifacts (STEP, STL, GLB, DWG)
-├── docker-compose.yml      # Multi-container orchestration (Backend + Frontend)
-└── .env.example            # Environment template
+├── aps-mcp-server/             # Model Context Protocol (MCP) Server (Node.js/TS)
+│   └── src/index.ts            # MCP Tools for Claude Desktop, Cursor, and OpenWebUI
+│
+└── tests/                      # Automated Verification & Benchmark Suites
+    ├── golden_cad/             # Golden benchmark JSON definitions
+    │   ├── flange.json         # ASME/ISO pipe flange golden benchmark
+    │   ├── plate.json          # Mounting plate benchmark
+    │   ├── cube.json           # Prismatic block benchmark
+    │   ├── bolt_pattern.json   # PCD circular pattern benchmark
+    │   └── sprocket.json       # ISO 606 drive sprocket benchmark
+    ├── test_golden_pipe_flange.py
+    ├── test_benchmark_suite.py
+    ├── test_golden_cad_benchmarks.py
+    ├── test_eli_conversational_editing.py
+    └── test_math_gears_sprockets.py
 ```
 
 ---
 
-## 🚀 Deployment Guide
+## 🚀 Quick Start Guide
 
-### Prerequisites
+### 1. Clone the Repository
+```bash
+git clone https://github.com/dkoustubh/AutoDesk-Inventor-MCP.git
+cd AutoDesk-Inventor-MCP
+```
 
-| Machine / Node | Requirements |
-|---|---|
-| **Central Server / Cloud** | Linux / macOS / Windows with Docker & Docker Compose **OR** Python 3.11+, Node.js 20+, Redis, PostgreSQL |
-| **CAD Workstation** | Windows 10/11 with **Autodesk Inventor** (2022+), .NET 8 SDK / Runtime or PowerShell 5.1+ |
-| **AI LLM Backend** | Local vLLM instance (e.g. `google/gemma-4-31B-it`), Ollama, or OpenAI/Anthropic API key |
+### 2. Configure Environment
+Create `.env` inside `backend/`:
+```env
+PROJECT_NAME="OmniCAD Industrial Engineering Platform"
+API_V1_STR="/api"
+VLLM_API_BASE="http://192.168.11.86:8000/v1"
+VLLM_MODEL="gemma-31b"
+REDIS_URL="redis://localhost:6379/0"
+DEFAULT_WORKSTATION_IP="192.168.11.150"
+```
 
----
-
-### Step 1: Central Server Setup (Docker Compose)
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/dkoustubh/AutoDesk-Inventor-MCP.git
-   cd AutoDesk-Inventor-MCP
-   ```
-
-2. Configure environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` to match your network topology:
-   ```env
-   HOST=0.0.0.0
-   PORT=8005
-   VLLM_API_BASE=http://192.168.11.86:8000/v1
-   VLLM_MODEL=google/gemma-4-31B-it
-   DATABASE_URL=postgresql+asyncpg://postgres:postgres@192.168.11.86:5432/ats_engineering
-   REDIS_URL=redis://192.168.11.86:6380/0
-   DEFAULT_WORKSTATION_IP=192.168.11.150
-   DEFAULT_USER_NAME=Koustubh Deodhar
-   ```
-
-3. Launch services using Docker Compose:
-   ```bash
-   docker compose up -d --build
-   ```
-
-4. Verify backend health:
-   ```bash
-   curl http://localhost:8005/health
-   # Expected: {"status": "ok", "active_agents": [...]}
-   ```
-
-5. Access the Web Studio:
-   ```
-   http://<SERVER_IP>:8085
-   ```
-
----
-
-### Step 2: Native Local Development Setup (Alternative)
-
-If running without Docker:
-
-#### 1. Backend (Python FastAPI)
+### 3. Start Central AI Gateway (Backend)
 ```bash
 cd backend
 python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8005 --reload
 ```
 
-#### 2. Frontend (React + Vite)
+### 4. Start OmniCAD Web Studio (Frontend)
 ```bash
 cd frontend
 npm install
-npm run dev -- --host
+npm run dev
+```
+Open your browser at `http://localhost:5173` or `http://localhost:9999`.
+
+### 5. Launch Autodesk Inventor Workstation Agent (Windows)
+On your Windows CAD workstation (`192.168.11.150`):
+```powershell
+cd autodesk-agent
+.\run.bat
+```
+The agent automatically connects to `ws://192.168.11.94:8005/ws/agent/192.168.11.150` and hooks into active Autodesk Inventor sessions.
+
+---
+
+## 🧪 Automated Testing & Benchmarks
+
+Run the complete 19-test verification suite:
+```bash
+pytest tests/ -v
+```
+
+### Test Coverage Summary:
+```text
+tests/test_golden_pipe_flange.py::test_stage_1_requirement_analyzer PASSED
+tests/test_golden_pipe_flange.py::test_stage_3_engineering_math_solver PASSED
+tests/test_golden_pipe_flange.py::test_stage_4_6_code_generation PASSED
+tests/test_golden_pipe_flange.py::test_stage_7_8_kernel_and_geometric_validation PASSED
+tests/test_golden_pipe_flange.py::test_golden_pipe_flange_full_pipeline_run PASSED
+tests/test_benchmark_suite.py::test_cad_benchmark_item[BASIC_CUBE_001] PASSED
+tests/test_benchmark_suite.py::test_cad_benchmark_item[BASIC_PLATE_002] PASSED
+tests/test_benchmark_suite.py::test_cad_benchmark_item[FEATURE_DRILLED_BLOCK_003] PASSED
+tests/test_benchmark_suite.py::test_cad_benchmark_item[GOLDEN_FLANGE_001] PASSED
+tests/test_golden_cad_benchmarks.py::test_golden_cad_benchmark[GOLDEN_BOLT_PATTERN_004] PASSED
+tests/test_golden_cad_benchmarks.py::test_golden_cad_benchmark[GOLDEN_CUBE_003] PASSED
+tests/test_golden_cad_benchmarks.py::test_golden_cad_benchmark[GOLDEN_FLANGE_001] PASSED
+tests/test_golden_cad_benchmarks.py::test_golden_cad_benchmark[GOLDEN_PLATE_002] PASSED
+tests/test_golden_cad_benchmarks.py::test_golden_cad_benchmark[GOLDEN_SPROCKET_005] PASSED
+tests/test_eli_conversational_editing.py::test_eli_initial_interpretation PASSED
+tests/test_eli_conversational_editing.py::test_eli_conversational_parametric_edit PASSED
+tests/test_eli_conversational_editing.py::test_eli_ambiguity_detection PASSED
+tests/test_math_gears_sprockets.py::test_sprocket_math_08b PASSED
+tests/test_math_gears_sprockets.py::test_planetary_gear_kinematics PASSED
+
+============================== 19 passed in 4.79s ==============================
 ```
 
 ---
 
-### Step 3: Windows Workstation Agent Setup
+## 🤝 Author & Contributor
 
-Run this on the Windows machine where Autodesk Inventor is installed.
-
-1. Transfer or clone the `autodesk-agent` directory to your Windows workstation.
-2. Launch **Autodesk Inventor** (open a blank Part document `.ipt` or leave Inventor running).
-3. Open PowerShell or Command Prompt inside `autodesk-agent`:
-
-   **Option A: Using the Compiled C# Agent**
-   ```cmd
-   build.bat
-   run.bat
-   ```
-
-   **Option B: Using the Standalone PowerShell Agent**
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File agent.ps1 -ServerUrl "ws://<SERVER_IP>:8005/ws/agent/<WORKSTATION_IP>"
-   ```
-
-4. The console will display:
-   ```text
-   [InventorAdapter] Attached to active Autodesk Inventor session.
-   [AgentWS] Connected to Central AI Server at ws://192.168.11.86:8005/ws/agent/192.168.11.150...
-   [AgentWS] Registered successfully on Central Server. Status: READY.
-   ```
+- **dkoustubh** — Lead Architect & Developer ([GitHub Profile](https://github.com/dkoustubh))
 
 ---
 
-### Step 4: Model Context Protocol (MCP) Server Setup
+## 📜 License
 
-Integrate Autodesk Inventor directly with your favorite AI tools.
-
-1. Build the MCP Server:
-   ```bash
-   cd aps-mcp-server
-   npm install
-   npm run build
-   ```
-
-2. Add to **Claude Desktop**:
-   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-
-   ```json
-   {
-     "mcpServers": {
-       "autodesk-inventor": {
-         "command": "node",
-         "args": ["<PATH_TO_REPO>/aps-mcp-server/dist/index.js"],
-         "env": {
-           "CAD_GATEWAY_URL": "http://192.168.11.86:8005",
-           "WORKSTATION_IP": "192.168.11.150"
-         }
-       }
-     }
-   }
-   ```
-
-3. Add to **Cursor IDE** (`.cursor/mcp.json`):
-   ```json
-   {
-     "mcpServers": {
-       "autodesk-inventor": {
-         "command": "node",
-         "args": ["./aps-mcp-server/dist/index.js"],
-         "env": {
-           "CAD_GATEWAY_URL": "http://192.168.11.86:8005",
-           "WORKSTATION_IP": "192.168.11.150"
-         }
-       }
-     }
-   }
-   ```
-
-4. Available MCP Tools:
-   - `inventor_create_box`: Create boxes, plates, blocks with custom dimensions (mm/cm).
-   - `inventor_create_cone`: Create cones and frustums.
-   - `inventor_create_rhombus`: Create rhombus/diamond 3D prisms.
-   - `inventor_create_sprocket`: Parametric sprockets and gears with teeth and pitch specifications.
-   - `inventor_create_compound`: Multi-feature complex boolean geometries.
-   - `aps_translate_model`: Translate STEP/IPT models for 3D web viewing.
-
----
-
-### Step 5: OpenWebUI Integration
-
-1. In OpenWebUI, navigate to **Workspace ➔ Tools**.
-2. Create a new tool and import `openwebui-tools/autodesk_inventor_tools.py`.
-3. Set the `CAD_GATEWAY_URL` to `http://<SERVER_IP>:8005`.
-4. In System Prompt or Model Knowledge, attach `openwebui-tools/autodesk_cad_skill.md`.
-
----
-
-## 🧪 End-to-End Verification Test
-
-1. Open the Web Studio at `http://<SERVER_IP>:8085`.
-2. Confirm the workstation indicator shows **ONLINE / READY** for target IP `192.168.11.150`.
-3. In the prompt bar, enter:
-   ```text
-   Create a 30 x 30 x 30 mm cube with 4mm mounting holes on each corner.
-   ```
-4. Click **Generate Design**.
-5. Observe:
-   - Real-time pipeline stage progress (**Planning ➔ Generating ➔ Kernel Validation ➔ Workstation Dispatch**).
-   - 3D WebGL preview render in the viewport.
-   - The solid cube created in real-time inside **Autodesk Inventor** on the Windows machine.
-
----
-
-## 🛠️ API & WebSocket Reference
-
-### HTTP REST Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/health` | Server and agent connection status |
-| `POST` | `/api/chat` | Natural language CAD generation endpoint |
-| `GET` | `/api/agents` | List connected workstation agents |
-| `GET` | `/api/jobs` | Retrieve CAD job history and status |
-| `POST` | `/api/export/{job_id}` | Export geometry as STEP, STL, or GLB |
-
-### WebSocket Endpoints
-
-| Endpoint | Protocol | Description |
-|---|---|---|
-| `/ws/agent/{client_ip}` | JSON RPC / Telemetry | Bidirectional channel for workstation CAD agents |
-| `/ws/ui/{client_id}` | Event Stream | Real-time telemetry feed for Web Studio UI |
-
----
-
-## 🤝 Contributors
-
-- **dkoustubh** ([@dkoustubh](https://github.com/dkoustubh)) — Creator & Lead Maintainer
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE).
