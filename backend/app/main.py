@@ -57,7 +57,12 @@ app.include_router(render_router, prefix=settings.API_V1_STR)
 app.include_router(ws_router)
 
 import os
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/download/autodesk-agent.zip")
 async def download_agent_zip():
@@ -68,6 +73,10 @@ async def download_agent_zip():
 
 @app.get("/")
 async def root():
+    index_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file):
+        with open(index_file, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
     return {
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,

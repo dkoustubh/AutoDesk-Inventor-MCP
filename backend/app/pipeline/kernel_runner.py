@@ -45,25 +45,14 @@ class KernelRunner:
             if solid_obj is None:
                 return False, None, {}, "No valid B-Rep solid object assigned to 'model'."
 
-            wrapped_shape = getattr(solid_obj, "wrapped", None)
-            if wrapped_shape is None:
-                return False, None, {}, "Solid object has no underlying OpenCASCADE shape."
-
-            if hasattr(wrapped_shape, "IsNull") and wrapped_shape.IsNull():
-                return False, None, {}, "Underlying OpenCASCADE shape is NULL (Standard_NullObject)."
-
             # Analyze basic topological metrics
             vol = getattr(solid_obj, "volume", 0.0)
             area = getattr(solid_obj, "area", 0.0)
             bbox = solid_obj.bounding_box()
 
             # BRep Analyzer validity check
-            is_brep_valid = False
-            try:
-                analyzer = BRepCheck_Analyzer(wrapped_shape)
-                is_brep_valid = bool(analyzer.IsValid())
-            except Exception as be:
-                logger.warning(f"BRepCheck_Analyzer error: {be}")
+            analyzer = BRepCheck_Analyzer(solid_obj.wrapped)
+            is_brep_valid = analyzer.IsValid()
 
             # Export STEP & STL
             step_path = os.path.join(self.export_dir, f"{model_id}.step")
