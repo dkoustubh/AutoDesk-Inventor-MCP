@@ -38,43 +38,9 @@ export const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Project & Version Management State
-  const [projectName, setProjectName] = useState('Mounting Plate');
-  const [versions, setVersions] = useState<CADVersion[]>([
-    {
-      id: 'v001',
-      versionNumber: 'v001',
-      prompt: 'Create a 100 x 60 x 20 mm mounting plate with four 8 mm through holes',
-      timestamp: Date.now() - 60000,
-      tool: 'inventor.create_box_with_hole',
-      shapeType: 'box_with_holes',
-      parameters: { length_mm: 100, width_mm: 60, height_mm: 20, hole_diameter_mm: 8, hole_count: 4 },
-      validation: {
-        is_valid: true,
-        is_solid: true,
-        volume_mm3: 115978.76,
-        bounding_box: { min_x: -50, max_x: 50, min_y: -30, max_y: 30, min_z: -10, max_z: 10, size_x: 100, size_y: 60, size_z: 20 },
-        face_count: 10,
-        edge_count: 24,
-        vertex_count: 16,
-        brep_check_status: true,
-        step_import_verified: true,
-        step_path: '/exports/v001.step',
-        message: 'Genuine Valid CAD Solid Verified: Volume=115978.76 mm³, OpenCascade BRepCheck=PASSED.'
-      },
-      features: [
-        { id: 'f1', name: 'Base Box Extrusion', type: 'box', parameters: { length: 100, width: 60, height: 20 } },
-        { id: 'f2', name: '4x Subtractive Through Holes', type: 'hole_pattern', parameters: { diameter: 8, pattern: '4_corners' } }
-      ],
-      pythonScript: `from build123d import *
-
-with BuildPart() as mounting_plate:
-    Box(100, 60, 20)
-    with Locations([(-35, -15), (-35, 15), (35, -15), (35, 15)]):
-        Hole(radius=4, depth=None)
-`
-    }
-  ]);
-  const [currentVersionId, setCurrentVersionId] = useState<string>('v001');
+  const [projectName, setProjectName] = useState('Untitled CAD Project');
+  const [versions, setVersions] = useState<CADVersion[]>([]);
+  const [currentVersionId, setCurrentVersionId] = useState<string>('');
 
   // Pipeline Execution State
   const [pipelineStage, setPipelineStage] = useState<PipelineStage>('idle');
@@ -86,7 +52,7 @@ with BuildPart() as mounting_plate:
   const [selectedGeometry, setSelectedGeometry] = useState<SelectedGeometryInfo | null>(null);
 
   // Active version reference
-  const activeVersion = versions.find(v => v.id === currentVersionId) || versions[versions.length - 1];
+  const activeVersion = versions.find(v => v.id === currentVersionId) || (versions.length > 0 ? versions[versions.length - 1] : null);
 
   // Apply Theme Mode
   useEffect(() => {
@@ -215,19 +181,12 @@ with BuildPart() as part:
 
   // Actions
   const handleNewModel = () => {
-    setProjectName('New CAD Part');
-    const newVersion: CADVersion = {
-      id: 'v001',
-      versionNumber: 'v001',
-      prompt: '',
-      timestamp: Date.now(),
-      tool: 'inventor.create_box',
-      shapeType: 'box',
-      parameters: { length_mm: 30, width_mm: 30, height_mm: 30 },
-      features: []
-    };
-    setVersions([newVersion]);
-    setCurrentVersionId('v001');
+    setProjectName('Untitled CAD Project');
+    setVersions([]);
+    setCurrentVersionId('');
+    setPipelineStage('idle');
+    setErrorMessage('');
+    setSelectedGeometry(null);
   };
 
   const handleDuplicateVersion = () => {

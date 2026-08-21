@@ -21,8 +21,8 @@ interface CadViewport3DProps {
 }
 
 export const CadViewport3D: React.FC<CadViewport3DProps> = ({
-  tool = 'inventor.create_box',
-  parameters = { length_mm: 30, width_mm: 30, height_mm: 30 },
+  tool = '',
+  parameters = {},
   lastPrompt = '',
   workstationIp = '192.168.11.150'
 }) => {
@@ -42,7 +42,7 @@ export const CadViewport3D: React.FC<CadViewport3DProps> = ({
   const prevMousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const p = parameters || {};
-  const hasGeometry = Boolean(tool && Object.keys(p).length > 0);
+  const hasGeometry = Boolean(tool && tool.trim() !== '' && Object.keys(p).length > 0 && (lastPrompt || Object.keys(p).length > 0));
 
   // Dimension extraction with accurate defaults
   const l = Number(p.length_mm) || Number(p.diagonal_x_mm) || Number(p.outer_diameter_mm) || 30;
@@ -204,6 +204,8 @@ export const CadViewport3D: React.FC<CadViewport3DProps> = ({
       const obj = modelGroupRef.current.children[0];
       modelGroupRef.current.remove(obj);
     }
+
+    if (!hasGeometry) return;
 
     const isRaw = viewMode === '3d_raw';
 
@@ -996,6 +998,27 @@ export const CadViewport3D: React.FC<CadViewport3DProps> = ({
             viewMode === '3d_raw' ? 'bg-white' : 'bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]'
           }`}
         >
+          {/* Blank Screen State when no drawing active */}
+          {!hasGeometry && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-20">
+              <div className="bg-slate-900/85 backdrop-blur-md border border-slate-800/90 rounded-2xl p-8 max-w-md text-center shadow-2xl">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto mb-4">
+                  <Box className="w-7 h-7 text-amber-400 animate-pulse" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-100 uppercase tracking-widest font-mono">
+                  CAD Workspace Blank
+                </h3>
+                <p className="text-xs text-slate-400 mt-2.5 leading-relaxed font-sans">
+                  No active drawing on screen. Enter an engineering prompt below to construct and view 3D parametric geometry.
+                </p>
+                <div className="mt-5 pt-3.5 border-t border-slate-800/80 flex items-center justify-center space-x-2 text-[11px] text-slate-500 font-mono">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span>Autodesk Inventor Adapter: Standby</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TOP-LEFT: Engineering Specifications Card */}
           {hasGeometry && (
             <div className="absolute top-6 left-6 z-30 pointer-events-auto bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-xl p-4 shadow-xl max-w-sm w-80 text-xs font-sans text-slate-800 animate-fadeIn">

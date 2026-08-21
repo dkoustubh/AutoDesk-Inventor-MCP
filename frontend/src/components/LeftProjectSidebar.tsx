@@ -90,39 +90,47 @@ export const LeftProjectSidebar: React.FC<LeftProjectSidebarProps> = ({
             </div>
 
             <div className="space-y-1">
-              {versions.slice().reverse().map((v) => {
-                const isActive = v.id === currentVersionId;
-                return (
-                  <div
-                    key={v.id}
-                    onClick={() => onSelectVersion(v.id)}
-                    className={`px-2.5 py-2 rounded-md cursor-pointer transition-all border ${
-                      isActive
-                        ? 'bg-amber-500/10 border-amber-500/40 text-white shadow-sm'
-                        : 'bg-slate-900/50 border-slate-800/60 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <span className={`font-mono text-xs font-bold ${isActive ? 'text-amber-400' : 'text-slate-400'}`}>
-                          {v.versionNumber}
-                        </span>
-                        {isActive && (
-                          <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">
-                            Active
+              {versions.length === 0 ? (
+                <div className="px-3 py-4 rounded-md border border-dashed border-slate-800 text-center text-slate-500 text-[11px] font-mono">
+                  No versions yet.
+                  <br />
+                  <span className="text-[10px] text-slate-600">Enter a prompt to create the first model.</span>
+                </div>
+              ) : (
+                versions.slice().reverse().map((v) => {
+                  const isActive = v.id === currentVersionId;
+                  return (
+                    <div
+                      key={v.id}
+                      onClick={() => onSelectVersion(v.id)}
+                      className={`px-2.5 py-2 rounded-md cursor-pointer transition-all border ${
+                        isActive
+                          ? 'bg-amber-500/10 border-amber-500/40 text-white shadow-sm'
+                          : 'bg-slate-900/50 border-slate-800/60 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className={`font-mono text-xs font-bold ${isActive ? 'text-amber-400' : 'text-slate-400'}`}>
+                            {v.versionNumber}
                           </span>
-                        )}
+                          {isActive && (
+                            <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">
+                              Active
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {new Date(v.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        {new Date(v.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <p className="text-[11px] truncate mt-1 text-slate-300 font-normal">
+                        {v.prompt || 'Initial CAD Model'}
+                      </p>
                     </div>
-                    <p className="text-[11px] truncate mt-1 text-slate-300 font-normal">
-                      {v.prompt || 'Initial CAD Model'}
-                    </p>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 

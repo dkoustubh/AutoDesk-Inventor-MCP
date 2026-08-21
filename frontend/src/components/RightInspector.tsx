@@ -102,14 +102,26 @@ export const RightInspector: React.FC<RightInspectorProps> = ({
 
           {/* Content Area */}
           <div className="flex-1 overflow-y-auto p-3 space-y-4 text-xs font-mono">
-            {/* TAB 1: PROPERTIES */}
-            {activeTab === 'properties' && (
-              <div className="space-y-3">
-                <div className="bg-slate-900/60 border border-slate-800/80 rounded-md p-3 space-y-2">
-                  <div className="flex justify-between text-slate-400">
-                    <span>Part Name</span>
-                    <span className="text-slate-200 font-semibold">{version?.tool ? version.tool.replace('inventor.create_', '').toUpperCase() : 'CAD_SOLID'}</span>
-                  </div>
+            {!version ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 space-y-2.5 p-4 border border-dashed border-slate-800 rounded-lg">
+                <div className="p-2.5 rounded-full bg-slate-900 border border-slate-800">
+                  <Box className="w-5 h-5 text-slate-500" />
+                </div>
+                <span className="font-semibold text-slate-300 text-xs">No Active Geometry</span>
+                <span className="text-[10px] text-slate-500 leading-normal">
+                  Inspector properties, topology, and validation telemetry will appear here once geometry is generated.
+                </span>
+              </div>
+            ) : (
+              <>
+                {/* TAB 1: PROPERTIES */}
+                {activeTab === 'properties' && (
+                  <div className="space-y-3">
+                    <div className="bg-slate-900/60 border border-slate-800/80 rounded-md p-3 space-y-2">
+                      <div className="flex justify-between text-slate-400">
+                        <span>Part Name</span>
+                        <span className="text-slate-200 font-semibold">{version.tool ? version.tool.replace('inventor.create_', '').toUpperCase() : 'CAD_SOLID'}</span>
+                      </div>
                   <div className="flex justify-between text-slate-400">
                     <span>Version</span>
                     <span className="text-cyan-400 font-bold">{version?.versionNumber || 'v001'}</span>
@@ -308,6 +320,8 @@ with BuildPart() as model:
 `}
                 </pre>
               </div>
+            )}
+              </>
             )}
           </div>
         </div>
