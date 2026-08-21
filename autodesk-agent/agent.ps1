@@ -139,6 +139,63 @@ function Execute-CADCommand($action, $params) {
 
                 Write-Host "[CAD] SUCCESS: Created 3-Tier Autodesk Valve Body with Center Through Bore in Inventor" -ForegroundColor Green
             }
+            elseif ($action -match "flange") {
+                # Parametric Pipe Flange: Base Disk + Raised Face + Bore + Bolt Pattern
+                $od_cm = if ($params.outer_diameter_mm) { [double]$params.outer_diameter_mm / 10.0 } else { 15.0 }
+                $thick_cm = if ($params.thickness_mm) { [double]$params.thickness_mm / 10.0 } else { 2.0 }
+                $bore_cm = if ($params.inner_bore_mm) { [double]$params.inner_bore_mm / 10.0 } elseif ($params.bore_diameter_mm) { [double]$params.bore_diameter_mm / 10.0 } else { 6.5 }
+                $rf_dia_cm = if ($params.raised_face_diameter_mm) { [double]$params.raised_face_diameter_mm / 10.0 } else { 9.5 }
+                $rf_h_cm = if ($params.raised_face_height_mm) { [double]$params.raised_face_height_mm / 10.0 } else { 0.4 }
+                $pcd_cm = if ($params.bolt_circle_dia_mm) { [double]$params.bolt_circle_dia_mm / 10.0 } elseif ($params.pcd_mm) { [double]$params.pcd_mm / 10.0 } else { 12.0 }
+                $bolt_count = if ($params.bolt_count) { [int]$params.bolt_count } else { 6 }
+                $bolt_dia_cm = if ($params.bolt_hole_dia_mm) { [double]$params.bolt_hole_dia_mm / 10.0 } elseif ($params.bolt_hole_diameter_mm) { [double]$params.bolt_hole_diameter_mm / 10.0 } else { 1.4 }
+
+                # 1. Base Flange Disk
+                $sketch.SketchCircles.AddByCenterRadius($tg.CreatePoint2d(0, 0), $od_cm / 2.0)
+                $profile1 = $sketch.Profiles.AddForSolid()
+                $extDef1 = $compDef.Features.ExtrudeFeatures.CreateExtrudeDefinition($profile1, 20481)
+                $extDef1.SetDistanceExtent($thick_cm, 20993)
+                $ext1 = $compDef.Features.ExtrudeFeatures.Add($extDef1)
+
+                # 2. Concentric Raised Face
+                if ($rf_dia_cm -gt 0 -and $rf_h_cm -gt 0) {
+                    $topFace1 = $ext1.Faces | Sort-Object { $_.PointOnFace.Z } | Select-Object -Last 1
+                    $sketchRF = $compDef.Sketches.Add($topFace1)
+                    $sketchRF.SketchCircles.AddByCenterRadius($tg.CreatePoint2d(0, 0), $rf_dia_cm / 2.0)
+                    $profileRF = $sketchRF.Profiles.AddForSolid()
+                    $extDefRF = $compDef.Features.ExtrudeFeatures.CreateExtrudeDefinition($profileRF, 20481)
+                    $extDefRF.SetDistanceExtent($rf_h_cm, 20993)
+                    $extRF = $compDef.Features.ExtrudeFeatures.Add($extDefRF)
+                }
+
+                # 3. Center Through Bore (Full Penetration)
+                $topFaceCurrent = $compDef.Faces | Sort-Object { $_.PointOnFace.Z } | Select-Object -Last 1
+                $sketchBore = $compDef.Sketches.Add($topFaceCurrent)
+                $sketchBore.SketchCircles.AddByCenterRadius($tg.CreatePoint2d(0, 0), $bore_cm / 2.0)
+                $profileBore = $sketchBore.Profiles.AddForSolid()
+                $extDefBore = $compDef.Features.ExtrudeFeatures.CreateExtrudeDefinition($profileBore, 20482) # kCutOperation
+                $extDefBore.SetThroughAllExtent(20995)
+                $compDef.Features.ExtrudeFeatures.Add($extDefBore)
+
+                # 4. Circular Bolt Hole Pattern on PCD
+                if ($bolt_count -gt 0 -and $bolt_dia_cm -gt 0 -and $pcd_cm -gt 0) {
+                    $topFaceBase = $ext1.Faces | Sort-Object { $_.PointOnFace.Z } | Select-Object -Last 1
+                    $sketchBolts = $compDef.Sketches.Add($topFaceBase)
+                    $pcd_r_cm = $pcd_cm / 2.0
+                    for ($i = 0; $i -lt $bolt_count; $i++) {
+                        $angle = (2.0 * [Math]::PI * $i) / $bolt_count
+                        $bx = $pcd_r_cm * [Math]::Cos($angle)
+                        $by = $pcd_r_cm * [Math]::Sin($angle)
+                        $sketchBolts.SketchCircles.AddByCenterRadius($tg.CreatePoint2d($bx, $by), $bolt_dia_cm / 2.0)
+                    }
+                    $profileBolts = $sketchBolts.Profiles.AddForSolid()
+                    $extDefBolts = $compDef.Features.ExtrudeFeatures.CreateExtrudeDefinition($profileBolts, 20482) # kCutOperation
+                    $extDefBolts.SetDistanceExtent($thick_cm + 0.5, 20993)
+                    $compDef.Features.ExtrudeFeatures.Add($extDefBolts)
+                }
+
+                Write-Host "[CAD] SUCCESS: Created Parametric Pipe Flange (Ø$($params.outer_diameter_mm)mm, Bore Ø$($params.inner_bore_mm)mm, $bolt_count Bolt Holes on Ø$($params.bolt_circle_dia_mm)mm PCD) in Autodesk Inventor" -ForegroundColor Green
+            }
             elseif ($action -match "rhombus") {
                 # 4-Point Diamond Sketch
                 $dx_cm = if ($params.diagonal_x_mm) { [double]$params.diagonal_x_mm / 10.0 } else { 3.0 }

@@ -102,12 +102,17 @@ class CreateCompoundParameters(BaseModel):
     centered: Optional[bool] = True
 
 class CreateFlangeParameters(BaseModel):
-    outer_diameter_mm: float = Field(100.0, gt=0, description="Flange outer diameter in mm")
-    inner_bore_mm: Optional[float] = Field(30.0, gt=0, description="Center fluid bore diameter in mm")
-    bolt_circle_dia_mm: Optional[float] = Field(75.0, gt=0, description="Pitch circle diameter for bolt holes")
-    bolt_count: Optional[int] = Field(4, ge=2, le=32, description="Number of bolt holes")
-    bolt_hole_dia_mm: Optional[float] = Field(8.0, gt=0, description="Diameter of bolt holes")
-    thickness_mm: Optional[float] = Field(12.0, gt=0, description="Flange flange thickness in mm")
+    outer_diameter_mm: float = Field(150.0, gt=0, description="Flange outer diameter in mm")
+    inner_bore_mm: Optional[float] = Field(65.0, gt=0, description="Center fluid bore diameter in mm")
+    bore_diameter_mm: Optional[float] = Field(None, gt=0, description="Alias for inner_bore_mm")
+    bolt_circle_dia_mm: Optional[float] = Field(120.0, gt=0, description="Pitch circle diameter for bolt holes")
+    pcd_mm: Optional[float] = Field(None, gt=0, description="Alias for bolt_circle_dia_mm")
+    bolt_count: Optional[int] = Field(6, ge=0, le=64, description="Number of bolt holes")
+    bolt_hole_dia_mm: Optional[float] = Field(14.0, gt=0, description="Diameter of bolt holes")
+    bolt_hole_diameter_mm: Optional[float] = Field(None, gt=0, description="Alias for bolt_hole_dia_mm")
+    thickness_mm: Optional[float] = Field(20.0, gt=0, description="Base flange thickness in mm")
+    raised_face_diameter_mm: Optional[float] = Field(95.0, ge=0, description="Raised face outer diameter in mm")
+    raised_face_height_mm: Optional[float] = Field(4.0, ge=0, description="Raised face height in mm")
 
 class CreateHexBoltParameters(BaseModel):
     thread_diameter_mm: float = Field(10.0, gt=0, description="Bolt shank thread diameter (e.g. M10 = 10mm)")
@@ -175,6 +180,11 @@ class ChatResponse(BaseModel):
     workstation_ip: str
     status: str
     message: str
+    validation_report: Optional[Dict[str, Any]] = None
+    step_url: Optional[str] = None
+    stl_url: Optional[str] = None
+    glb_url: Optional[str] = None
+    named_parameters: Optional[Dict[str, float]] = None
 
 # --- Agent Registration & Heartbeat ---
 
