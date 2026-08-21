@@ -1,0 +1,40 @@
+{
+  "test_id": "GOLDEN_FLANGE_001",
+  "name": "Industrial Pipe Flange",
+  "prompt": "Create a pipe flange with 150 mm outer diameter and 20 mm flange thickness. Add a 65 mm center through-bore, a raised face of 95 mm diameter extruded 4 mm, and a circular pattern of 6 bolt holes of 14 mm diameter on a 120 mm pitch circle diameter (PCD).",
+  "expected_specification": {
+    "part_type": "pipe_flange",
+    "units": "mm",
+    "dimensions": {
+      "outer_diameter_mm": 150.0,
+      "thickness_mm": 20.0,
+      "inner_bore_mm": 65.0,
+      "raised_face_diameter_mm": 95.0,
+      "raised_face_height_mm": 4.0,
+      "bolt_pcd_mm": 120.0,
+      "bolt_count": 6,
+      "bolt_hole_diameter_mm": 14.0
+    }
+  },
+  "expected_features": [
+    "base_cylinder",
+    "raised_face",
+    "through_bore",
+    "circular_hole_pattern"
+  ],
+  "validation_criteria": {
+    "volume_tolerance_pct": 1.0,
+    "expected_volume_mm3": 283670.11,
+    "must_be_watertight": true,
+    "must_be_single_solid": true,
+    "checklist": {
+      "outer_diameter_150mm": true,
+      "total_height_verified": true,
+      "center_bore_65mm": true,
+      "raised_face_95mm": true,
+      "bolt_pattern_6_holes_on_pcd": true,
+      "manifold_and_watertight": true,
+      "valid_solid_brep": true
+    }
+  }
+}

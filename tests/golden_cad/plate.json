@@ -1,0 +1,28 @@
+{
+  "test_id": "GOLDEN_PLATE_002",
+  "name": "Rectangular Mounting Plate with 4 Corner Holes",
+  "prompt": "Create a 100 x 60 x 20 mm mounting plate with four 8 mm through holes",
+  "expected_specification": {
+    "part_type": "mounting_plate",
+    "units": "mm",
+    "dimensions": {
+      "length_mm": 100.0,
+      "width_mm": 60.0,
+      "thickness_mm": 20.0,
+      "hole_diameter_mm": 8.0,
+      "hole_count": 4
+    }
+  },
+  "expected_features": [
+    "base_box",
+    "hole_pattern"
+  ],
+  "validation_criteria": {
+    "must_be_watertight": true,
+    "must_be_single_solid": true,
+    "checklist": {
+      "manifold_and_watertight": true,
+      "valid_solid_brep": true
+    }
+  }
+}

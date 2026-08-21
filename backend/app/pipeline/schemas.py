@@ -125,3 +125,15 @@ class PipelineResult(BaseModel):
     python_code: str = ""
     named_parameters: Dict[str, float] = {}
     message: str = ""
+
+    @property
+    def step_file_path(self) -> str:
+        return self.step_path or ""
+
+    @property
+    def stl_file_path(self) -> str:
+        return self.stl_path or ""
+
+    @property
+    def glb_file_path(self) -> str:
+        return self.glb_path or ""

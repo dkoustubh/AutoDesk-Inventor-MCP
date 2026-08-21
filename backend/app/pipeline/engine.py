@@ -19,6 +19,8 @@ from app.pipeline.kernel_runner import kernel_runner
 from app.pipeline.geometric_validator import geometric_validator
 from app.pipeline.visual_validator import visual_validator
 from app.pipeline.repair_engine import repair_engine
+from app.pipeline.eli import EngineeringLanguageInterpreter, ELIResult
+from app.pipeline.feature_graph import FeatureGraph
 
 logger = logging.getLogger(__name__)
 
@@ -30,14 +32,38 @@ class EngineeringCADPipeline:
 
     def __init__(self, max_repair_iterations: int = 3):
         self.max_repair_iterations = max_repair_iterations
+        self.eli = EngineeringLanguageInterpreter()
 
-    def run(self, prompt: str, model_id: str = "cad_model", context: Optional[Dict[str, Any]] = None) -> PipelineResult:
+    def run(self, prompt: str, model_id: str = "cad_model", context: Optional[Dict[str, Any]] = None, current_graph: Optional[FeatureGraph] = None) -> PipelineResult:
         logger.info(f"[Pipeline] Starting 10-stage CAD reasoning for: '{prompt}'")
 
         # -------------------------------------------------------------
-        # STAGE 1 & 2: REQUIREMENT ANALYZER & COMPLETENESS CHECK
+        # STAGE 1 & 2: ELI INTERPRETER, AMBIGUITY CHECK & REQUIREMENT SPEC
         # -------------------------------------------------------------
-        req_spec: RequirementSpec = requirement_analyzer.analyze(prompt, context=context)
+        eli_result: ELIResult = self.eli.interpret(prompt, current_graph=current_graph)
+        req_spec: RequirementSpec = eli_result.spec
+
+        # Handle Ambiguity / Clarification
+        if eli_result.clarification and eli_result.clarification.is_ambiguous:
+            logger.info(f"[Pipeline Stage 1-2] Clarification required: {eli_result.clarification.question}")
+            return PipelineResult(
+                success=False,
+                part_type="clarification_needed",
+                prompt=prompt,
+                requirements=req_spec,
+                feature_plan=FeaturePlan(part_type="clarification", operations=[], named_parameters={}),
+                constraint_report=ConstraintReport(valid=False, checks=[], warnings=[eli_result.clarification.question]),
+                validation_report=GeometricValidationResult(
+                    is_valid=False, is_solid=False, is_watertight=False,
+                    volume_mm3=0.0, surface_area_mm2=0.0,
+                    checklist={"clarification_needed": True}
+                ),
+                python_code="# Clarification needed from user",
+                step_file_path="",
+                stl_file_path="",
+                glb_file_path=""
+            )
+
         logger.info(f"[Pipeline Stage 1-2] Requirements extracted: {len(req_spec.features)} features, Complete={req_spec.is_complete}")
 
         # -------------------------------------------------------------
@@ -118,12 +144,10 @@ class EngineeringCADPipeline:
             ),
             visual_report=vis_result,
             iterations_used=iteration,
-            step_path=final_meta.get("step_path"),
-            stl_path=final_meta.get("stl_path"),
-            glb_path=final_meta.get("glb_path"),
             python_code=python_code,
-            named_parameters=plan.named_parameters,
-            message="CAD generation and geometric validation succeeded." if is_overall_success else "Validation failed after repair attempts."
+            step_path=final_meta.get("step_path", ""),
+            stl_path=final_meta.get("stl_path", ""),
+            glb_path=final_meta.get("glb_path", "")
         )
 
 engineering_pipeline = EngineeringCADPipeline()

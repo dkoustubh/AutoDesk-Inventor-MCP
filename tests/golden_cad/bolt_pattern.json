@@ -1,0 +1,29 @@
+{
+  "test_id": "GOLDEN_BOLT_PATTERN_004",
+  "name": "Circular Pitch Circle Diameter Pattern",
+  "prompt": "Create a 120 mm circular flange with 4 bolt holes of 10 mm on a 90 mm PCD and a 40 mm center hole",
+  "expected_specification": {
+    "part_type": "pipe_flange",
+    "units": "mm",
+    "dimensions": {
+      "outer_diameter_mm": 120.0,
+      "inner_bore_mm": 40.0,
+      "bolt_pcd_mm": 90.0,
+      "bolt_count": 4,
+      "bolt_hole_diameter_mm": 10.0
+    }
+  },
+  "expected_features": [
+    "base_cylinder",
+    "through_bore",
+    "circular_hole_pattern"
+  ],
+  "validation_criteria": {
+    "must_be_watertight": true,
+    "must_be_single_solid": true,
+    "checklist": {
+      "manifold_and_watertight": true,
+      "valid_solid_brep": true
+    }
+  }
+}

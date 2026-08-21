@@ -237,12 +237,18 @@ class RequirementAnalyzer:
                 parameters={"length_mm": l, "width_mm": w, "height_mm": h}
             ))
 
+        # Build canonical dimensions dictionary
+        canonical_dims = dict(extracted)
+        for k, v in extracted.items():
+            if not k.endswith("_mm") and k not in ["bolt_count", "teeth_count"]:
+                canonical_dims[f"{k}_mm"] = v
+
         spec = RequirementSpec(
             part_type=part_type,
             units="mm",
             is_complete=(len(missing_fields) == 0),
             missing_fields=missing_fields,
-            dimensions=extracted,
+            dimensions=canonical_dims,
             features=features,
             raw_prompt=prompt,
             notes=f"Successfully analyzed {len(features)} parametric feature groups."

@@ -19,8 +19,9 @@ class FeaturePlanner:
             od = 150.0
             thick = 20.0
             bore = 65.0
-            rf_dia = 95.0
-            rf_h = 4.0
+            has_rf = any(f.id == "raised_face" for f in spec.features)
+            rf_dia = 95.0 if has_rf else 0.0
+            rf_h = 4.0 if has_rf else 0.0
             bolt_count = 6
             bolt_dia = 14.0
             pcd = 120.0
