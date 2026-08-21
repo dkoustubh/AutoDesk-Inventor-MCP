@@ -131,6 +131,68 @@ class FeaturePlanner:
                     description=f"Cut centered through-hole of Ø{hole_dia}mm."
                 ))
 
+        elif spec.part_type == "u_bracket":
+            width = 100.0
+            height = 60.0
+            thick = 5.0
+            depth = 50.0
+            for f in spec.features:
+                if f.id == "u_channel_body":
+                    width = float(f.parameters.get("width_mm", width))
+                    height = float(f.parameters.get("height_mm", height))
+                    thick = float(f.parameters.get("thickness_mm", thick))
+                    depth = float(f.parameters.get("depth_mm", depth))
+
+            named_params = {
+                "CHANNEL_WIDTH": width,
+                "CHANNEL_HEIGHT": height,
+                "WALL_THICKNESS": thick,
+                "EXTRUSION_DEPTH": depth
+            }
+
+            operations.append(OperationStep(
+                step_number=1,
+                operation_type="create_u_channel",
+                feature_id="u_channel_body",
+                parameters={
+                    "width_mm": width,
+                    "height_mm": height,
+                    "thickness_mm": thick,
+                    "depth_mm": depth
+                },
+                description=f"Construct 3D U-bracket ({width}mm wide x {height}mm high x {depth}mm depth x {thick}mm wall thickness)."
+            ))
+
+        elif spec.part_type == "l_bracket":
+            l = 80.0
+            w = 60.0
+            h = 60.0
+            t = 8.0
+            rib_t = 8.0
+            for f in spec.features:
+                if f.id == "l_bracket_body":
+                    l = float(f.parameters.get("length_mm", l))
+                    w = float(f.parameters.get("width_mm", w))
+                    h = float(f.parameters.get("height_mm", h))
+                    t = float(f.parameters.get("thickness_mm", t))
+                    rib_t = float(f.parameters.get("rib_thickness_mm", rib_t))
+
+            named_params = {
+                "BASE_LENGTH": l,
+                "BRACKET_WIDTH": w,
+                "WALL_HEIGHT": h,
+                "WALL_THICKNESS": t,
+                "RIB_THICKNESS": rib_t
+            }
+
+            operations.append(OperationStep(
+                step_number=1,
+                operation_type="create_l_bracket",
+                feature_id="l_bracket_body",
+                parameters={"length_mm": l, "width_mm": w, "height_mm": h, "thickness_mm": t, "rib_thickness_mm": rib_t},
+                description=f"Construct L-bracket ({l}x{w}x{h}mm, {t}mm thickness, {rib_t}mm rib)."
+            ))
+
         else:
             # Generic fallback
             named_params = {"LENGTH": 50.0, "WIDTH": 50.0, "HEIGHT": 20.0}

@@ -1,0 +1,25 @@
+{
+  "test_id": "GOLDEN_UBRACKET_006",
+  "name": "Structural U-Channel Bracket",
+  "prompt": "Create a U-bracket 100 mm wide, 60 mm high and 5 mm thick",
+  "expected_specification": {
+    "part_type": "u_bracket",
+    "units": "mm",
+    "dimensions": {
+      "width_mm": 100.0,
+      "height_mm": 60.0,
+      "thickness_mm": 5.0
+    }
+  },
+  "expected_features": [
+    "u_channel_body"
+  ],
+  "validation_criteria": {
+    "must_be_watertight": true,
+    "must_be_single_solid": true,
+    "checklist": {
+      "manifold_and_watertight": true,
+      "valid_solid_brep": true
+    }
+  }
+}

@@ -216,6 +216,44 @@ class RequirementAnalyzer:
                 }
             ))
 
+        elif "u-bracket" in p_lower or "u_bracket" in p_lower or "u bracket" in p_lower or "u-channel" in p_lower or "c-bracket" in p_lower or "channel bracket" in p_lower:
+            part_type = "u_bracket"
+            width = extracted.get("width", 100.0)
+            height = extracted.get("height", 60.0)
+            thick = extracted.get("thickness", 5.0)
+            depth = extracted.get("length") or extracted.get("depth", 50.0)
+
+            features.append(FeatureRequirement(
+                id="u_channel_body",
+                feature_type="u_channel",
+                parameters={
+                    "width_mm": width,
+                    "height_mm": height,
+                    "thickness_mm": thick,
+                    "depth_mm": depth
+                }
+            ))
+
+        elif "l-bracket" in p_lower or "l_bracket" in p_lower or "l bracket" in p_lower or "angle bracket" in p_lower or "bracket" in p_lower:
+            part_type = "l_bracket"
+            length = extracted.get("length", 80.0)
+            width = extracted.get("width", 60.0)
+            height = extracted.get("height", 60.0)
+            thick = extracted.get("thickness", 8.0)
+            rib_thick = extracted.get("rib_thickness", 8.0)
+
+            features.append(FeatureRequirement(
+                id="l_bracket_body",
+                feature_type="l_bracket",
+                parameters={
+                    "length_mm": length,
+                    "width_mm": width,
+                    "height_mm": height,
+                    "thickness_mm": thick,
+                    "rib_thickness_mm": rib_thick
+                }
+            ))
+
         elif "cylinder" in p_lower or "roller" in p_lower or "shaft" in p_lower:
             part_type = "cylindrical_shaft"
             dia = extracted.get("outer_diameter") or extracted.get("length", 50.0)

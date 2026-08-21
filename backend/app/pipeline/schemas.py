@@ -13,7 +13,8 @@ class FeatureRequirement(BaseModel):
     feature_type: Literal[
         "base_cylinder", "base_box", "through_bore", "blind_hole",
         "raised_face", "circular_hole_pattern", "linear_hole_pattern",
-        "boss", "fillet", "chamfer", "keyway", "flange", "rib", "custom"
+        "boss", "fillet", "chamfer", "keyway", "flange", "rib",
+        "u_channel", "l_bracket", "channel", "bracket", "custom"
     ]
     parameters: Dict[str, Any]
     dependencies: List[str] = []

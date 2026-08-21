@@ -109,6 +109,39 @@ model = part.part
 """
             return code
 
+        elif plan.part_type == "u_bracket":
+            params = plan.named_parameters
+            w = params.get("CHANNEL_WIDTH", 100.0)
+            h = params.get("CHANNEL_HEIGHT", 60.0)
+            t = params.get("WALL_THICKNESS", 5.0)
+            d = params.get("EXTRUSION_DEPTH", 50.0)
+
+            code = f"""import math
+import build123d as bd
+
+# 3D U-Channel Bracket Parameters
+CHANNEL_WIDTH = {w:.2f}
+CHANNEL_HEIGHT = {h:.2f}
+WALL_THICKNESS = {t:.2f}
+EXTRUSION_DEPTH = {d:.2f}
+
+with bd.BuildPart() as part:
+    # 1. Base Solid Bounding Volume
+    with bd.BuildSketch(bd.Plane.XY):
+        bd.Rectangle(CHANNEL_WIDTH, EXTRUSION_DEPTH)
+    bd.extrude(amount=CHANNEL_HEIGHT)
+
+    # 2. Subtractive U-Channel Interior Clearance
+    inner_w = max(1.0, CHANNEL_WIDTH - 2.0 * WALL_THICKNESS)
+    cut_h = CHANNEL_HEIGHT - WALL_THICKNESS + 2.0
+    with bd.BuildSketch(bd.Plane.XY.offset(WALL_THICKNESS)):
+        bd.Rectangle(inner_w, EXTRUSION_DEPTH + 4.0)
+    bd.extrude(amount=cut_h, mode=bd.Mode.SUBTRACT)
+
+model = part.part
+"""
+            return code
+
         else:
             return """import build123d as bd
 
